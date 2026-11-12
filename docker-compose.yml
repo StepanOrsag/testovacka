@@ -6,9 +6,17 @@ services:
       POSTGRES_PASSWORD: secretpassword
       POSTGRES_DB: parcel_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgis_data:/var/lib/postgresql/data
+
+  importer:
+    image: ghcr.io/osgeo/gdal:ubuntu-small-latest
+    depends_on:
+      - db
+    volumes:
+      - ./data:/data
+    command: bash /data/import.sh
 
 volumes:
   postgis_data:
