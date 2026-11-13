@@ -1,4 +1,4 @@
-const map = L.map('map', { preferCanvas: true }).setView([50.437, 15.352], 17);
+const map = L.map('map', { preferCanvas: true }).setView([50.437, 15.352], 10);
 
 let districtLayer;
 
