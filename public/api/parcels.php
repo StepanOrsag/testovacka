@@ -10,7 +10,7 @@ try {
     $zoom = isset($_GET['zoom']) ? (int) $_GET['zoom'] : 0;
     $bbox = $_GET['bbox'] ?? null;
 
-    if ($zoom < 14) {
+    if ($zoom < 16) {
         echo json_encode([
             'type' => 'FeatureCollection',
             'features' => [],

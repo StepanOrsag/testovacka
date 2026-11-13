@@ -1,1 +1,28 @@
-<h1>Viagem Mapa Parcel</h1>
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viagem – Mapa parcel okresu Jičín</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <div id="status-bar" class="status-bar">Načítám mapu...</div>
+
+    <aside id="sidebar" class="sidebar hidden">
+        <button id="close-sidebar" class="close-btn">&times;</button>
+        <div id="sidebar-content">
+            <h2>Detail parcely</h2>
+            <p class="placeholder-text">Klikněte na parcelu pro zobrazení detailu.</p>
+        </div>
+    </aside>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
