@@ -10,6 +10,15 @@ services:
     volumes:
       - postgis_data:/var/lib/postgresql/data
 
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+
   importer:
     image: ghcr.io/osgeo/gdal:ubuntu-small-latest
     depends_on:
