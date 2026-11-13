@@ -1,12 +1,63 @@
-const map = L.map('map', { preferCanvas: true }).setView([50.437, 15.352], 15);
+const map = L.map('map', { preferCanvas: true }).setView([50.437, 15.352], 17);
+
+let districtLayer;
+
+fetch('https://raw.githubusercontent.com/siwekm/czech-geojson/master/okresy.json')
+    .then(res => res.json())
+    .then(data => {
+        const jicinDistrict = data.features.find(f => {
+            const text = (JSON.stringify(f.properties) + ' ' + (f.id || '')).toLowerCase();
+            return text.includes('cz0522') || text.includes('jičín') || text.includes('jicin') || text.includes('3604');
+        });
+
+        console.log('Nalezený okres Jičín:', jicinDistrict);
+
+        if (jicinDistrict) {
+            districtLayer = L.geoJSON(jicinDistrict, {
+                interactive: true,
+                style: {
+                    color: '#e11d48',
+                    weight: 3,
+                    dashArray: '8, 8',
+                    fillColor: '#f43f5e',
+                    fillOpacity: 0.04
+                }
+            }).addTo(map);
+            districtLayer.bringToBack();
+
+            districtLayer.bindTooltip("Okres Jičín (klikněte pro přiblížení)", { sticky: true });
+
+            districtLayer.on('click', (e) => {
+                if (map.getZoom() < 17) {
+                    map.setView(e.latlng, 17);
+                }
+            });
+
+        }
+        else {
+            console.warn('Okres Jičín nebyl v souboru nalezen. Dostupné vlastnosti prvního prvku:', data.features[0].properties);
+        }
+    })
+    .catch(err => console.error('Chyba při stahování hranice okresu:', err));
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '© OpenStreetMap přispěvatelé | Data parcel ČÚZK'
 }).addTo(map);
 
+let selectedParcelId = null;
+
 let parcelsLayer = L.geoJSON(null, {
     style: function (feature) {
+        if (feature.properties.id === selectedParcelId) {
+            return {
+                color: '#dc2626',
+                weight: 3,
+                fillColor: '#ef4444',
+                fillOpacity: 0.45
+            };
+        }
+
         return {
             color: '#2563eb',
             weight: 1.5,
@@ -16,17 +67,30 @@ let parcelsLayer = L.geoJSON(null, {
     },
     onEachFeature: function (feature, layer) {
         layer.on('mouseover', function () {
-            this.setStyle({
-                weight: 2.5,
-                color: '#1d4ed8',
-                fillOpacity: 0.4
-            });
+            if (feature.properties.id !== selectedParcelId) {
+                this.setStyle({
+                    weight: 2.5,
+                    color: '#1d4ed8',
+                    fillOpacity: 0.4
+                });
+            }
         });
+
         layer.on('mouseout', function () {
-            parcelsLayer.resetStyle(this);
+            if (feature.properties.id !== selectedParcelId) {
+                parcelsLayer.resetStyle(this);
+            }
         });
+
         layer.on('click', function (e) {
             L.DomEvent.stopPropagation(e);
+
+            selectedParcelId = feature.properties.id;
+
+            parcelsLayer.eachLayer(function (l) {
+                parcelsLayer.resetStyle(l);
+            });
+
             showParcelDetail(feature.properties);
         });
     }
@@ -37,17 +101,22 @@ const sidebar = document.getElementById('sidebar');
 const sidebarContent = document.getElementById('sidebar-content');
 const closeSidebarBtn = document.getElementById('close-sidebar');
 
-closeSidebarBtn.addEventListener('click', () => {
-    sidebar.classList.add('hidden');
-});
+function deselectParcel() {
+    selectedParcelId = null;
 
-map.on('click', () => {
+    parcelsLayer.eachLayer(function (l) {
+        parcelsLayer.resetStyle(l);
+    });
+
     sidebar.classList.add('hidden');
-});
+}
+
+closeSidebarBtn.addEventListener('click', deselectParcel);
+map.on('click', deselectParcel);
 
 async function loadParcels() {
-    const zoom = map.getZoom();
     const bounds = map.getBounds();
+    const zoom = map.getZoom();
     const bbox = bounds.toBBoxString();
     if (zoom < 16) {
         parcelsLayer.clearLayers();
