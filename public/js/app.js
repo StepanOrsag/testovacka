@@ -147,6 +147,7 @@ function showParcelDetail(props) {
     const cisloParcely = props.poddeleni_cisla
         ? `${props.kmenove_cislo}/${props.poddeleni_cisla}`
         : `${props.kmenove_cislo}`;
+
     sidebarContent.innerHTML = `
         <h2 style="margin-bottom: 16px;">Parcela č. ${cisloParcely}</h2>
         
@@ -159,14 +160,15 @@ function showParcelDetail(props) {
             <div class="parcel-detail-value">${Number(props.vymera).toLocaleString('cs-CZ')} m²</div>
         </div>
         <div class="parcel-detail-row">
-            <div class="parcel-detail-label">Kód druhu pozemku</div>
-            <div class="parcel-detail-value">${props.druh_pozemku_kod || 'Neuvedeno'}</div>
+            <div class="parcel-detail-label">Druh pozemku</div>
+            <div class="parcel-detail-value">${props.druh_pozemku_nazev || 'Neuvedeno'}</div>
         </div>
         <div class="parcel-detail-row">
             <div class="parcel-detail-label">Identifikátor parcely (ID)</div>
             <div class="parcel-detail-value" style="font-size: 13px; color: #64748b;">${props.id}</div>
         </div>
     `;
+
     sidebar.classList.remove('hidden');
 }
 map.on('moveend', loadParcels);

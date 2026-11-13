@@ -27,6 +27,19 @@ class ParcelRepository
                             'poddeleni_cisla', p.poddeleni_cisla,
                             'vymera', p.vymera,
                             'druh_pozemku_kod', p.druh_pozemku_kod,
+                            'druh_pozemku_nazev', CASE p.druh_pozemku_kod
+                                WHEN 2 THEN 'Orná půda'
+                                WHEN 3 THEN 'Chmelnice'
+                                WHEN 4 THEN 'Vinice'
+                                WHEN 5 THEN 'Zahrada'
+                                WHEN 6 THEN 'Ovocný sad'
+                                WHEN 7 THEN 'Trvalý travní porost'
+                                WHEN 10 THEN 'Lesní pozemek'
+                                WHEN 11 THEN 'Vodní plocha'
+                                WHEN 13 THEN 'Zastavěná plocha a nádvoří'
+                                WHEN 14 THEN 'Ostatní plocha'
+                                ELSE 'Neznámý druh'
+                            END,
                             'zpusob_vyuziti_kod', p.zpusob_vyuziti_kod,
                             'ku_kod', p.ku_kod,
                             'ku_nazev', ca.nazev
