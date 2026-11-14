@@ -32,8 +32,10 @@ services:
         condition: service_healthy
     volumes:
       - ./data:/data
-    command: >
-      bash -c "sed -e 's/\r$//' -e 's/\xC2\xA0/ /g' /data/import.sh | bash"
+    command:
+      - bash
+      - -c
+      - 'sed -e "s/\r$//" -e "s/\xC2\xA0/ /g" /data/import.sh | bash'
 
 volumes:
   postgis_data:
