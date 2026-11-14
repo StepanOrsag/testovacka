@@ -9,6 +9,11 @@ services:
       - "5433:5432"
     volumes:
       - postgis_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U viagem_user -d parcel_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   web:
     build: .
@@ -17,15 +22,18 @@ services:
     volumes:
       - .:/var/www/html
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   importer:
     image: ghcr.io/osgeo/gdal:ubuntu-small-latest
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - ./data:/data
-    command: bash /data/import.sh
+    command: >
+      bash -c "sed -e 's/\r$//' -e 's/\xC2\xA0/ /g' /data/import.sh | bash"
 
 volumes:
   postgis_data:
